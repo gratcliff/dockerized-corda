@@ -73,10 +73,9 @@ def rpcUsersList = [
          'permissions' : ["ALL"]]
 ]
 
-task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
+task deployNodes(type: net.corda.plugins.Dockerform, dependsOn: ['jar']) {
     delete "./build/nodes"
     directory "./build/nodes"
-
     node {
         name "O=Notary,L=London,C=GB"
         notary = [validating: false]

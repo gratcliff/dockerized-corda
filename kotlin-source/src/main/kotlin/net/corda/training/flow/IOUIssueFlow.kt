@@ -2,6 +2,8 @@ package net.corda.training.flow
 
 import co.paralleluniverse.fibers.Suspendable
 import net.corda.core.contracts.requireThat
+import net.corda.core.contracts.Command
+import net.corda.core.contracts.StateAndContract
 import net.corda.core.flows.CollectSignaturesFlow
 import net.corda.core.flows.FinalityFlow
 import net.corda.core.flows.FlowLogic
@@ -13,6 +15,7 @@ import net.corda.core.flows.StartableByRPC
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
 import net.corda.training.state.IOUState
+import net.corda.training.contract.IOUContract
 
 /**
  * This is the flow which handles issuance of new IOUs on the ledger.
@@ -25,10 +28,18 @@ import net.corda.training.state.IOUState
 class IOUIssueFlow(val state: IOUState) : FlowLogic<SignedTransaction>() {
     @Suspendable
     override fun call(): SignedTransaction {
-        // Placeholder code to avoid type error when running the tests. Remove before starting the flow task!
-        return serviceHub.signInitialTransaction(
-                TransactionBuilder(notary = null)
-        )
+      val notaryRef = serviceHub.networkMapCache.notaryIdentities.first()
+      val issue = Command(IOUContract.Commands.Issue(), state.participants.map { it.owningKey })
+      val tx = TransactionBuilder(notaryRef)
+        .withItems(issue, StateAndContract(state, IOUContract.IOU_CONTRACT_ID))
+      tx.verify(serviceHub)
+
+      val signedTransaction = serviceHub.signInitialTransaction(tx)
+      val receivingParty = (state.participants - ourIdentity).single()
+      val session = initiateFlow(receivingParty)
+      val stx = subFlow(CollectSignaturesFlow(signedTransaction, setOf(session)))
+      subFlow(FinalityFlow(stx))
+      return stx
     }
 }
 
