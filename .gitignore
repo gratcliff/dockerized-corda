@@ -11,7 +11,11 @@ tags
 .gradle
 
 # General build files
-**/build/*
+**/build/classes/*
+**/build/kotlin/*
+**/build/libs/*
+**/build/resources/*
+**/build/tmp/*
 !docs/build/*
 
 lib/dokka.jar

@@ -1,0 +1,21 @@
+version: '3'
+services:
+  notary:
+    build: /Users/gabriel.ratcliff/Documents/Accenture/blockchain/cordaLearning/corda-training-template/kotlin-source/build/nodes/Notary
+    ports:
+    - 10003
+  participanta:
+    build: /Users/gabriel.ratcliff/Documents/Accenture/blockchain/cordaLearning/corda-training-template/kotlin-source/build/nodes/ParticipantA
+    ports:
+    - 10003
+    - "10009:10009"
+  participantb:
+    build: /Users/gabriel.ratcliff/Documents/Accenture/blockchain/cordaLearning/corda-training-template/kotlin-source/build/nodes/ParticipantB
+    ports:
+    - 10003
+    - "10012:10012"
+  participantc:
+    build: /Users/gabriel.ratcliff/Documents/Accenture/blockchain/cordaLearning/corda-training-template/kotlin-source/build/nodes/ParticipantC
+    ports:
+    - 10003
+    - "10015:10015"
